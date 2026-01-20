@@ -1,0 +1,25 @@
+name: Test OPEX Bot
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-opex-bot:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: pip install requests
+      
+      - name: Run OPEX bot test
+        env:
+          OPEX_WEBHOOK: ${{ secrets.OPEX_WEBHOOK }}
+        run: python opex_2026_bot.py --test
