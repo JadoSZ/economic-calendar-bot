@@ -13,8 +13,8 @@ on:
           - 'weekly'
         default: 'none'
   schedule:
-    - cron: '0 8 * * 1'  # Monday 8 AM UTC
-    - cron: '0 8 * * *'  # Daily 8 AM UTC
+    - cron: '0 8 * * 1'      # Monday 8 AM UTC (weekly preview)
+    - cron: '0 8 * * *'      # Daily 8 AM UTC (D-1 reminders)
     - cron: '0 9-17/2 * * 1-5'  # Every 2 hours during market hours
 
 jobs:
@@ -36,14 +36,14 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
-          if [ "${{ github.event.inputs.test_mode }}" == "tomorrow" ]; then
+          if [ "${{ github.event.inputs.test_mode || 'none' }}" == "tomorrow" ]; then
             echo "🧪 Testing tomorrow's events..."
             python bot.py --tomorrow
-          elif [ "${{ github.event.inputs.test_mode }}" == "weekly" ]; then
+          elif [ "${{ github.event.inputs.test_mode || 'none' }}" == "weekly" ]; then
             echo "📅 Testing weekly preview..."
             python bot.py --weekly
           else
-            echo "⏰ Running normal bot logic..."
+            echo "⏰ Running normal schedule logic..."
             python bot.py
           fi
 
