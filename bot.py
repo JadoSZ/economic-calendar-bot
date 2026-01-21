@@ -537,7 +537,17 @@ def main():
     hour = now.hour
     
     # Support command-line flags for testing
-    if '--test' in sys.argv or '--tomorrow' in sys.argv:
+    if '--test' in sys.argv:
+        print("✅ Test mode: Sending test message...")
+        send_discord_embed(
+            title="🤖 Economic Calendar Bot",
+            description="Bot is working! This is a test message.",
+            color=5763719,  # Green
+            footer_text="Economic Calendar Bot • Test Message"
+        )
+        return
+    
+    if '--tomorrow' in sys.argv:
         print("🧪 Testing mode: Fetching tomorrow's events...")
         send_tomorrows_events()
         return
@@ -545,6 +555,11 @@ def main():
     if '--weekly' in sys.argv:
         print("📅 Testing mode: Sending weekly preview...")
         weekly_preview()
+        return
+    
+    if '--results' in sys.argv:
+        print("🔍 Testing mode: Checking for released results...")
+        check_results()
         return
     
     # Scheduled tasks
