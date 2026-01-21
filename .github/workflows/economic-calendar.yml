@@ -37,6 +37,8 @@ jobs:
           pip install requests beautifulsoup4 pytz
       
       - name: Run bot
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           if [ "${{ github.event.inputs.test_mode || 'none' }}" = "tomorrow" ]; then
             python bot.py --tomorrow
@@ -52,8 +54,6 @@ jobs:
           else
             python bot.py
           fi
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         
   opex_2026:
     runs-on: ubuntu-latest
