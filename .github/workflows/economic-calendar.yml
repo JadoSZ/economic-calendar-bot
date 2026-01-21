@@ -38,11 +38,11 @@ jobs:
       
       - name: Run bot
         run: |
-          if [ "${{ github.event.inputs.test_mode }}" = "tomorrow" ]; then
+          if [ "${{ github.event.inputs.test_mode || 'none' }}" = "tomorrow" ]; then
             python bot.py --tomorrow
-          elif [ "${{ github.event.inputs.test_mode }}" = "weekly" ]; then
+          elif [ "${{ github.event.inputs.test_mode || 'none' }}" = "weekly" ]; then
             python bot.py --weekly
-          elif [ "${{ github.event.inputs.test_mode }}" = "all" ]; then
+          elif [ "${{ github.event.inputs.test_mode || 'none' }}" = "all" ]; then
             echo "Running all tests..."
             echo "=== Tomorrow's Events ==="
             python bot.py --tomorrow
