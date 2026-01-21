@@ -1,6 +1,17 @@
 name: Economic Calendar Bot
 
 on:
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: 'Test mode'
+        required: false
+        type: choice
+        options:
+          - 'none'
+          - 'tomorrow'
+          - 'weekly'
+        default: 'none'
   schedule:
     # Monday 8 AM UTC (weekly preview)
     - cron: '0 8 * * 1'
@@ -8,7 +19,6 @@ on:
     - cron: '0 8 * * *'
     # Every 2 hours 9 AM - 5 PM UTC (check for results)
     - cron: '0 9-17/2 * * 1-5'
-  workflow_dispatch:
 
 jobs:
   notify:
@@ -28,7 +38,14 @@ jobs:
       - name: Run bot
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        run: python bot.py
+        run: |
+          if [ "${{ github.event.inputs.test_mode }}" == "tomorrow" ]; then
+            python bot.py --tomorrow
+          elif [ "${{ github.event.inputs.test_mode }}" == "weekly" ]; then
+            python bot.py --weekly
+          else
+            python bot.py
+          fi
         
   opex_2026:
     runs-on: ubuntu-latest
