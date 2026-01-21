@@ -20,6 +20,15 @@ on:
           - 'Weekly Preview'
           - 'Check Results'
         default: 'Tomorrow''s Events'
+        description: 'Test mode'
+        required: false
+        default: 'none'
+        type: choice
+        options:
+          - none
+          - tomorrow
+          - weekly
+          - all
 
 jobs:
   notify:
@@ -61,6 +70,18 @@ jobs:
             esac
           else
             echo "⏰ Running scheduled bot..."
+          if [ "${{ github.event.inputs.test_mode || 'none' }}" = "tomorrow" ]; then
+            python bot.py --tomorrow
+          elif [ "${{ github.event.inputs.test_mode || 'none' }}" = "weekly" ]; then
+            python bot.py --weekly
+          elif [ "${{ github.event.inputs.test_mode || 'none' }}" = "all" ]; then
+            echo "Running all tests..."
+            echo "=== Tomorrow's Events ==="
+            python bot.py --tomorrow
+            echo ""
+            echo "=== Weekly Preview ==="
+            python bot.py --weekly
+          else
             python bot.py
           fi
         
