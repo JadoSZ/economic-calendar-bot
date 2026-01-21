@@ -9,6 +9,17 @@ on:
     # Every 2 hours 9 AM - 5 PM UTC (check for results)
     - cron: '0 9-17/2 * * 1-5'
   workflow_dispatch:
+    inputs:
+      test_mode:
+        description: 'Test mode'
+        required: false
+        default: 'none'
+        type: choice
+        options:
+          - none
+          - tomorrow
+          - weekly
+          - all
 
 jobs:
   notify:
@@ -28,7 +39,21 @@ jobs:
       - name: Run bot
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        run: python bot.py
+        run: |
+          if [ "${{ github.event.inputs.test_mode || 'none' }}" = "tomorrow" ]; then
+            python bot.py --tomorrow
+          elif [ "${{ github.event.inputs.test_mode || 'none' }}" = "weekly" ]; then
+            python bot.py --weekly
+          elif [ "${{ github.event.inputs.test_mode || 'none' }}" = "all" ]; then
+            echo "Running all tests..."
+            echo "=== Tomorrow's Events ==="
+            python bot.py --tomorrow
+            echo ""
+            echo "=== Weekly Preview ==="
+            python bot.py --weekly
+          else
+            python bot.py
+          fi
         
   opex_2026:
     runs-on: ubuntu-latest
