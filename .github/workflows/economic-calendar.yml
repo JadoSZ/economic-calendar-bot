@@ -11,6 +11,15 @@ on:
   workflow_dispatch:
     inputs:
       test_mode:
+        description: 'Select test mode'
+        required: true
+        type: choice
+        options:
+          - 'Test Message (Default)'
+          - 'Tomorrow''s Events'
+          - 'Weekly Preview'
+          - 'Check Results'
+        default: 'Tomorrow''s Events'
         description: 'Test mode'
         required: false
         default: 'none'
@@ -40,6 +49,27 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            case "${{ github.event.inputs.test_mode }}" in
+              "Tomorrow's Events")
+                echo "🧪 Testing tomorrow's events..."
+                python bot.py --tomorrow
+                ;;
+              "Weekly Preview")
+                echo "📅 Testing weekly preview..."
+                python bot.py --weekly
+                ;;
+              "Check Results")
+                echo "🔍 Testing results checker..."
+                python bot.py --results
+                ;;
+              *)
+                echo "✅ Sending test message..."
+                python bot.py --test
+                ;;
+            esac
+          else
+            echo "⏰ Running scheduled bot..."
           if [ "${{ github.event.inputs.test_mode || 'none' }}" = "tomorrow" ]; then
             python bot.py --tomorrow
           elif [ "${{ github.event.inputs.test_mode || 'none' }}" = "weekly" ]; then
