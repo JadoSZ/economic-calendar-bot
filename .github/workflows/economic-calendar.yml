@@ -36,10 +36,10 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
-          if [ "${{ github.event.inputs.test_mode }}" == "tomorrow" ]; then
+          if [ "${{ github.event.inputs.test_mode || 'none' }}" == "tomorrow" ]; then
             echo "🧪 Testing tomorrow's events..."
             python bot.py --tomorrow
-          elif [ "${{ github.event.inputs.test_mode }}" == "weekly" ]; then
+          elif [ "${{ github.event.inputs.test_mode || 'none' }}" == "weekly" ]; then
             echo "📅 Testing weekly preview..."
             python bot.py --weekly
           else
