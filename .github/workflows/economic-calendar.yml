@@ -9,6 +9,17 @@ on:
     # Every 2 hours 9 AM - 5 PM UTC (check for results)
     - cron: '0 9-17/2 * * 1-5'
   workflow_dispatch:
+    inputs:
+      test_mode:
+        description: 'Select test mode'
+        required: true
+        type: choice
+        options:
+          - 'Test Message (Default)'
+          - 'Tomorrow''s Events'
+          - 'Weekly Preview'
+          - 'Check Results'
+        default: 'Tomorrow''s Events'
 
 jobs:
   notify:
@@ -28,7 +39,30 @@ jobs:
       - name: Run bot
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        run: python bot.py
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            case "${{ github.event.inputs.test_mode }}" in
+              "Tomorrow's Events")
+                echo "🧪 Testing tomorrow's events..."
+                python bot.py --tomorrow
+                ;;
+              "Weekly Preview")
+                echo "📅 Testing weekly preview..."
+                python bot.py --weekly
+                ;;
+              "Check Results")
+                echo "🔍 Testing results checker..."
+                python bot.py --results
+                ;;
+              *)
+                echo "✅ Sending test message..."
+                python bot.py --test
+                ;;
+            esac
+          else
+            echo "⏰ Running scheduled bot..."
+            python bot.py
+          fi
         
   opex_2026:
     runs-on: ubuntu-latest
